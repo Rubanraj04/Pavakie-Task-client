@@ -193,8 +193,18 @@ const Profile = () => {
     }
 
     try {
-      // Extract fileId from resumeUrl
-      const fileId = profile.resumeUrl.split('/').pop();
+      // Extract fileId from resumeUrl (format: /api/upload/resume/:fileId)
+      let fileId = profile.resumeUrl;
+      if (fileId.includes('/')) {
+        fileId = fileId.split('/').pop();
+      }
+      // Remove any query parameters
+      fileId = fileId.split('?')[0];
+      
+      if (!fileId || fileId === 'undefined') {
+        throw new Error('Invalid resume file ID');
+      }
+      
       await axios.delete(`${API_URL}/upload/resume/${fileId}`);
       
       setProfile({
